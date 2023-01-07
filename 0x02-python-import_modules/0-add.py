@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+
+"""Adds a and b"""
 if __name__=="__main__":
     from add_0 import add
     a=1
