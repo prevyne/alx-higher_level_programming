@@ -1,30 +1,29 @@
 #!/usr/bin/python3
-'''Prints the id of a State object with a given name in a database.
-'''
-import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+"""
+Script that prints the State object with the name passed as argument
+from the database
+Using module SQLAlchemy
+"""
 
 from model_state import Base, State
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sys import argv
 
+if __name__ == "__main__":
+    # create an engine
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(
+        argv[1], argv[2], argv[3]), pool_pre_ping=True)
+    # create a configured "Session" class
+    Session = sessionmaker(bind=engine)
+    # create a Session
+    session = Session()
+    Base.metadata.create_all(engine)
 
-if __name__ == '__main__':
-    if len(sys.argv) >= 5:
-        user = sys.argv[1]
-        pword = sys.argv[2]
-        db_name = sys.argv[3]
-        state_name = sys.argv[4]
-        chk = map(lambda x: x.isalpha() or (x in (' ', '%', '_')), state_name)
-        if not all(chk):
-            state_name = ''
-        DATABASE_URL = "mysql://{}:{}@localhost:3306/{}".format(
-            user, pword, db_name
-        )
-        engine = create_engine(DATABASE_URL)
-        Base.metadata.create_all(engine)
-        session = sessionmaker(bind=engine)()
-        result = session.query(State).filter(State.name == state_name).first()
-        if result is not None:
-            print('{}'.format(result.id))
-        else:
-            print('Not found')
+    s_tate = session.query(State).filter(State.name == argv[4]).first()
+
+    if s_tate:
+        print("{}".format(s_tate.id))
+    else:
+        print("Not found")
+    session.close()
